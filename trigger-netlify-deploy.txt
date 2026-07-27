@@ -1,0 +1,5 @@
+Trigger Netlify deploy
+
+This file was added to force a new commit and trigger Netlify to redeploy the site.
+
+Timestamp: 2026-07-27T00:00:00Z
