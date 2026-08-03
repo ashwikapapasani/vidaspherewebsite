@@ -453,17 +453,6 @@ footer.site-footer .ig-foot svg{ width:18px; height:18px; }
   </div>
 </section>
 
-<!-- ================= EVENT MAP ================= -->
-<section class="event-map-section">
-  <div class="section-heading">
-    <h2>Community events near you</h2>
-    <p>Hover over a pin to see the event name, date, time, and location. Click a marker for a fuller preview of the event details.</p>
-  </div>
-  <div class="event-map-card">
-    <div id="event-map"></div>
-  </div>
-</section>
-
 <!-- ================= MICROGREENS ================= -->
 <section class="bg-purple">
   <div class="two-col">
@@ -520,73 +509,6 @@ footer.site-footer .ig-foot svg{ width:18px; height:18px; }
     </div>
   </div>
 </footer>
-
-<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
-<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
-<script>
-  const events = [
-    {
-      name: 'Free Fest 2026',
-      date: 'Saturday, August 1, 2026',
-      time: '12:00 PM – 4:00 PM',
-      location: 'Philadelphia Navy Yard (Marine Parade Grounds, 4747 S. Broad St, Philadelphia, PA 19112)',
-      lat: 39.9036,
-      lng: -75.1712
-    },
-    {
-      name: 'National Night Out',
-      date: 'Tuesday, August 4, 2026',
-      time: '5:00 PM – 8:00 PM',
-      location: 'Lancaster Walk (3300 Block of Lancaster Ave, Behind the Drexel Recreation Center)',
-      lat: 39.9589,
-      lng: -75.1920
-    },
-    {
-      name: 'Back to School Carnival',
-      date: 'Friday, August 7, 2026',
-      time: '11:00 AM – 3:00 PM',
-      location: 'St. Christopher’s Hospital for Children Parking Lot (160 E. Erie Avenue, Philadelphia, PA 19134)',
-      lat: 39.9980,
-      lng: -75.1267
-    },
-    {
-      name: 'Family and Friends Day',
-      date: 'Saturday, August 8, 2026',
-      time: '11:00 AM – 3:00 PM',
-      location: 'Resurgence Worship Cathedral (4100 W. Girard Avenue, Philadelphia, PA 19104)',
-      lat: 39.9715,
-      lng: -75.1655
-    },
-    {
-      name: 'Community in Action Festival',
-      date: 'Saturday, August 22, 2026',
-      time: '12:00 PM – 4:00 PM',
-      location: 'Cobbs Creek Community Environmental Center (700 Cobbs Creek Pkwy, Philadelphia, PA 19143)',
-      lat: 39.9242,
-      lng: -75.2438
-    }
-  ];
-
-  const map = L.map('event-map', { zoomControl: true }).setView([39.95, -75.17], 11);
-
-  L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-    maxZoom: 19,
-    attribution: '&copy; OpenStreetMap contributors'
-  }).addTo(map);
-
-  events.forEach((event) => {
-    const marker = L.marker([event.lat, event.lng]).addTo(map);
-    const tooltipText = `${event.name}<br>${event.date}<br>${event.time}<br>${event.location}`;
-
-    marker.bindTooltip(tooltipText, {
-      direction: 'top',
-      permanent: false,
-      sticky: true
-    });
-
-    marker.bindPopup(`<strong>${event.name}</strong><br>${event.date}<br>${event.time}<br><br>${event.location}`);
-  });
-</script>
 
 </body>
 </html>
