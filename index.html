@@ -319,9 +319,7 @@ footer.site-footer .ig-foot svg{ width:18px; height:18px; }
   nav.mainnav{ flex-wrap:wrap; justify-content:center; gap:14px 22px; }
   section{ padding:40px 20px; }
   .two-col .col-img{ overflow:hidden; }
-  .two-col .col-img img,
-  .hero img,
-  .community img{
+  .two-col .col-img img{
     width:100%;
     max-width:100%;
     height:auto;
@@ -330,7 +328,13 @@ footer.site-footer .ig-foot svg{ width:18px; height:18px; }
   }
   .hero img,
   .community img{
-    aspect-ratio:4 / 3;
+    display:block;
+    width:100%;
+    max-width:min(100%, 520px);
+    height:auto;
+    margin:0 auto;
+    object-fit:contain;
+    object-position:center;
   }
   .hero h1{ font-size:34px; }
   .hero h2{ font-size:20px; }
