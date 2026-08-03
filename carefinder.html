@@ -1,0 +1,608 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Care Finder | VidaSphere</title>
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,500;0,9..144,600;0,9..144,700&family=Poppins:wght@300;400;500;600&display=swap');
+
+:root{
+  --purple: #531a4a;
+  --maroon: #611d43;
+  --red: #9b2929;
+  --lavender: #ae9def;
+  --pale-lavender: #d1c8f4;
+  --coral: #d34f4f;
+  --mint: #b0e8d0;
+  --blush: #fcf0f0;
+  --input-bg: #f9eef0;
+  --cream: #fbf1e9;
+}
+
+*{box-sizing:border-box;}
+body{
+  margin:0;
+  font-family:'Poppins',sans-serif;
+  font-weight:300;
+  color:var(--purple);
+  background:#fff;
+}
+h1,h2,h3,.logo{ font-family:'Fraunces',serif; font-weight:600; margin:0; }
+a{ color:inherit; }
+img{ max-width:100%; display:block; }
+
+.site-header{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  padding:28px 60px;
+  flex-wrap:wrap;
+  gap:16px;
+  background:var(--purple);
+  color:var(--cream);
+}
+.logo{ font-size:26px; color:var(--lavender); text-decoration:none; letter-spacing:.5px; }
+nav.mainnav{ display:flex; align-items:center; gap:34px; flex-wrap:wrap; }
+nav.mainnav a{ text-decoration:none; font-size:14px; letter-spacing:.3px; color:inherit; padding-bottom:2px; }
+nav.mainnav a.active{ text-decoration:underline; text-underline-offset:5px; }
+nav.mainnav .ig{ display:flex; align-items:center; }
+nav.mainnav .ig svg{ width:18px; height:18px; }
+
+section{ padding:70px 60px; }
+.bg-purple{ background:var(--purple); color:var(--cream); }
+.bg-blush{ background:var(--blush); color:var(--purple); }
+.btn{
+  display:inline-block;
+  border:none;
+  cursor:pointer;
+  border-radius:999px;
+  padding:14px 24px;
+  font-family:'Poppins',sans-serif;
+  font-size:14px;
+  letter-spacing:.3px;
+  text-decoration:none;
+  text-align:center;
+}
+.btn-lavender{ background:var(--lavender); color:var(--purple); }
+.btn-purple{ background:var(--purple); color:var(--lavender); }
+
+.vital-links{
+  margin-top:28px;
+  background:#fff;
+  border:1px solid rgba(83,26,74,0.12);
+  border-radius:18px;
+  padding:24px;
+  box-shadow:0 8px 24px rgba(83,26,74,0.06);
+}
+.vital-links h3{
+  font-size:22px;
+  color:var(--maroon);
+  margin-bottom:12px;
+}
+.vital-links p{ font-size:14px; line-height:1.7; margin:0 0 16px; }
+.link-list{ display:grid; grid-template-columns:repeat(2, minmax(0, 1fr)); gap:12px; }
+.link-card{
+  border:1px solid rgba(83,26,74,0.12);
+  border-radius:12px;
+  padding:12px 14px;
+  background:var(--blush);
+}
+.link-card a{ text-decoration:none; font-weight:600; color:var(--purple); }
+.link-card span{ display:block; margin-top:6px; font-size:13px; color:rgba(83,26,74,0.75); }
+
+.carefinder-hero{ text-align:center; padding-top:40px; padding-bottom:40px; }
+.carefinder-hero h1{ font-size:44px; margin-bottom:12px; color:var(--coral); }
+.carefinder-hero p{ max-width:760px; margin:0 auto; font-size:15px; line-height:1.7; }
+
+.carefinder-shell{ max-width:1160px; margin:0 auto; }
+.controls{
+  background:#fff;
+  border:1px solid rgba(83,26,74,0.12);
+  border-radius:18px;
+  padding:24px;
+  box-shadow:0 8px 24px rgba(83,26,74,0.06);
+}
+.search-row{ display:flex; gap:12px; flex-wrap:wrap; margin-bottom:18px; }
+.search-row input{
+  flex:1;
+  min-width:240px;
+  border:1px solid rgba(83,26,74,0.2);
+  border-radius:999px;
+  padding:13px 16px;
+  font-size:14px;
+  color:var(--purple);
+  background:var(--input-bg);
+}
+.filter-row{ display:flex; gap:10px; flex-wrap:wrap; margin-bottom:18px; }
+.filter-chip{
+  border:1px solid rgba(83,26,74,0.15);
+  background:#fff;
+  color:var(--purple);
+  border-radius:999px;
+  padding:8px 14px;
+  font-size:13px;
+  cursor:pointer;
+}
+.filter-chip.active{ background:var(--lavender); color:var(--purple); border-color:var(--lavender); }
+.view-toggle{ display:flex; gap:10px; flex-wrap:wrap; }
+.view-toggle button{
+  border:none;
+  border-radius:999px;
+  padding:10px 16px;
+  font-size:13px;
+  cursor:pointer;
+  background:var(--pale-lavender);
+  color:var(--purple);
+}
+.view-toggle button.active{ background:var(--purple); color:var(--cream); }
+
+.results-meta{ margin:20px 0 16px; font-size:13px; color:rgba(83,26,74,0.75); }
+.map-section{ margin:24px 0 22px; }
+.map-card{
+  background:#fff;
+  border:1px solid rgba(83,26,74,0.12);
+  border-radius:18px;
+  padding:18px;
+  box-shadow:0 8px 24px rgba(83,26,74,0.06);
+}
+.map-card h3{ font-size:20px; color:var(--maroon); margin:0 0 6px; }
+.map-card p{ font-size:13px; color:rgba(83,26,74,0.75); margin:0 0 12px; }
+#carefinder-map{ width:100%; height:420px; border-radius:14px; overflow:hidden; }
+.leaflet-container{ font-family:'Poppins', sans-serif; }
+.leaflet-tooltip{ border:none; border-radius:10px; padding:10px 12px; box-shadow:0 6px 18px rgba(0,0,0,0.12); color:var(--purple); }
+.event-grid{ display:grid; grid-template-columns:repeat(2, minmax(0,1fr)); gap:20px; }
+.event-card{
+  background:#fff;
+  border:1px solid rgba(83,26,74,0.12);
+  border-radius:16px;
+  padding:20px;
+  box-shadow:0 6px 18px rgba(83,26,74,0.05);
+}
+.event-card h3{ font-size:20px; margin-bottom:8px; color:var(--maroon); }
+.event-card .meta{ font-size:13px; color:rgba(83,26,74,0.75); margin-bottom:8px; }
+.event-card p{ font-size:14px; line-height:1.7; margin:0 0 10px; }
+.event-card .pill{ display:inline-block; background:var(--blush); color:var(--purple); padding:6px 10px; border-radius:999px; font-size:12px; margin:4px 6px 4px 0; }
+.card-actions{ display:flex; gap:10px; flex-wrap:wrap; margin-top:12px; }
+.card-actions a{ text-decoration:none; }
+.empty-state{ background:#fff; border:1px dashed rgba(83,26,74,0.2); border-radius:16px; padding:24px; text-align:center; }
+
+footer.site-footer{ background:var(--pale-lavender); padding:44px 60px; display:flex; justify-content:space-between; align-items:flex-start; flex-wrap:wrap; gap:20px; }
+footer.site-footer .foot-name{ font-size:26px; color:var(--purple); }
+footer.site-footer .foot-email{ font-size:26px; color:var(--purple); font-family:'Fraunces',serif; font-weight:600; }
+
+@media (max-width: 760px){
+  section{ padding:50px 24px; }
+  .site-header{ padding:22px 24px; }
+  .event-grid{ grid-template-columns:1fr; }
+  .link-list{ grid-template-columns:1fr; }
+  .carefinder-hero h1{ font-size:32px; }
+  footer.site-footer{ padding:36px 24px; }
+}
+</style>
+</head>
+<body>
+<header class="site-header">
+  <a href="index.html" class="logo">VidaSphere</a>
+  <nav class="mainnav">
+    <a href="partners.html">Partners</a>
+    <a href="carefinder.html" class="active">Care Finder</a>
+    <a href="gallery.html">Gallery</a>
+    <a href="contact.html">Contact</a>
+    <a class="ig" href="https://www.instagram.com/" target="_blank" rel="noopener" aria-label="Instagram">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="2" width="20" height="20" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.5" cy="6.5" r="1"/></svg>
+    </a>
+  </nav>
+</header>
+
+<section class="bg-purple carefinder-hero">
+  <h1>Care Finder &amp; Community Calendar Hub</h1>
+  <p>Search for free screenings, nutrition support, wellness events, and volunteer opportunities across Philadelphia and nearby neighborhoods.</p>
+</section>
+
+<section class="bg-blush">
+  <div class="carefinder-shell">
+    <div class="controls">
+      <div class="search-row">
+        <input id="searchInput" type="text" placeholder="Search by zip, neighborhood, or service" />
+      </div>
+      <div class="filter-row" id="filterRow"></div>
+      <div class="view-toggle">
+        <button class="active" data-view="services">I Need Services</button>
+        <button data-view="volunteer">I Want to Volunteer</button>
+      </div>
+    </div>
+
+    <div class="results-meta" id="resultsMeta"></div>
+    <div class="map-section">
+      <div class="map-card">
+        <h3>Community map</h3>
+        <p>Hover or tap a pin to preview the event details. If you are a volunteer interested in helping with one of these events, please fill out the <a href="contact.html" style="color:var(--maroon); text-decoration:underline;">contact form</a>.</p>
+        <div id="carefinder-map"></div>
+      </div>
+    </div>
+    <div class="event-grid" id="eventGrid"></div>
+
+    <div class="vital-links">
+      <h3>Vital Links</h3>
+      <p>Helpful food and resource links for Philadelphia residents who need quick support.</p>
+      <div class="link-list">
+        <div class="link-card">
+          <a href="https://www.phila.gov/documents/find-free-food-and-meals-in-philadelphia/" target="_blank" rel="noopener">Philadelphia Food Access</a>
+          <span>City resources for food access and support programs.</span>
+        </div>
+        <div class="link-card">
+          <a href="https://www.phila.gov/documents/philadelphia-food-policy-road-map/" target="_blank" rel="noopener">Office of Food Policy</a>
+          <span>Philadelphia's citywide food policy and access information.</span>
+        </div>
+        <div class="link-card">
+          <a href="https://www.feedingamerica.org/find-your-local-foodbank" target="_blank" rel="noopener">Feeding America Food Bank Locator</a>
+          <span>Find local food assistance near you.</span>
+        </div>
+        <div class="link-card">
+          <a href="https://www.nourishphilly.org/" target="_blank" rel="noopener">Nourish Philly</a>
+          <span>Programs focused on food justice and community wellness.</span>
+        </div>
+        <div class="link-card">
+          <a href="https://www.chop.edu/centers-programs/healthier-together/pillars-hunger" target="_blank" rel="noopener">CHOP Food Insecurity Resources</a>
+          <span>Health-centered food access support and guidance.</span>
+        </div>
+        <div class="link-card">
+          <a href="https://www.philabundance.org/" target="_blank" rel="noopener">Greater Philadelphia Food Bank</a>
+          <span>Food pantry and nutrition support resources across the region.</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<footer class="site-footer">
+  <div>
+    <div class="foot-name">VidaSphere</div>
+  </div>
+  <div>
+    <div class="foot-email"><a href="mailto:teamvsphere@gmail.com">teamvsphere@gmail.com</a></div>
+  </div>
+</footer>
+
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script>
+const events = [
+  {
+    title: 'Free Fest 2026',
+    date: 'Saturday, August 1, 2026 · 12:00 PM – 4:00 PM',
+    location: 'Philadelphia Navy Yard (Marine Parade Grounds, 4747 S. Broad St, Philadelphia, PA 19112)',
+    description: 'Community resource fair with health education and outreach activities.',
+    services: ['Community Outreach', 'Health Education'],
+    category: 'Health',
+    view: 'services',
+    volunteerText: 'Volunteer Sign-Up',
+    volunteerLink: 'https://forms.cloud.microsoft/r/wqqnq9hxgZ'
+  },
+  {
+    title: 'National Night Out',
+    date: 'Tuesday, August 4, 2026 · 5:00 PM – 8:00 PM',
+    location: 'Lancaster Walk (3300 Block of Lancaster Ave, Behind the Drexel Recreation Center)',
+    description: 'Neighborhood safety and wellness event with health screenings and community engagement.',
+    services: ['Free Health Screenings', 'Community Outreach'],
+    category: 'Health',
+    view: 'services',
+    volunteerText: 'Volunteer Sign-Up',
+    volunteerLink: 'https://forms.cloud.microsoft/r/LCCGydfw3v'
+  },
+  {
+    title: '16th Annual Back to School Carnival',
+    date: 'Friday, August 7, 2026 · 11:00 AM – 3:00 PM',
+    location: 'St. Christopher’s Hospital for Children Parking Lot (160 E. Erie Avenue, Philadelphia, PA 19134)',
+    description: 'Pediatric wellness resources, school readiness materials, and family support.',
+    services: ['Pediatric Health', 'Family Wellness'],
+    category: 'Youth',
+    view: 'services',
+    volunteerText: 'Volunteer Sign-Up',
+    volunteerLink: 'https://forms.cloud.microsoft/r/NXJzWRMdNr'
+  },
+  {
+    title: '2026 Back to School Community Fair',
+    date: 'Saturday, August 8, 2026 · 1:00 PM – 3:00 PM',
+    location: 'Christy Recreation Center (728 S. 55th St., Philadelphia, PA 19143)',
+    description: 'Free screenings, youth wellness supplies, and school resources.',
+    services: ['Free Screenings', 'Youth Wellness'],
+    category: 'Youth',
+    view: 'services',
+    volunteerText: 'Volunteer Sign-Up',
+    volunteerLink: 'https://forms.cloud.microsoft/r/wqT6JrSaBF'
+  },
+  {
+    title: 'Family and Friends Day and Community Health Fair',
+    date: 'Saturday, August 8, 2026 · 11:00 AM – 3:00 PM',
+    location: 'Resurgence Worship Cathedral (4100 W. Girard Avenue, Philadelphia, PA 19104)',
+    description: 'Health screenings, wellness counseling, and family resources.',
+    services: ['Health Screenings', 'Family Resources'],
+    category: 'Health',
+    view: 'services',
+    volunteerText: 'Volunteer Sign-Up',
+    volunteerLink: 'https://forms.cloud.microsoft/r/ceaPiWTmxm'
+  },
+  {
+    title: 'Healthy Fam Jam',
+    date: 'Tuesday, August 11, 2026 · 4:00 PM – 8:00 PM',
+    location: 'Dornsife Center (3509 Spring Garden St, Philadelphia, PA 19104)',
+    description: 'Family health counseling, nutrition education, and wellness screenings.',
+    services: ['Nutrition Education', 'Health Screenings'],
+    category: 'Nutrition',
+    view: 'services',
+    volunteerText: 'Volunteer Sign-Up',
+    volunteerLink: 'https://forms.cloud.microsoft/r/a4FCHqYACC'
+  },
+  {
+    title: 'Kids Smile Back to School Bash',
+    date: 'Saturday, August 15, 2026 · 11:00 AM – 2:00 PM',
+    location: '5828 Market St, Philadelphia, PA 19139',
+    description: 'Dental health education, back-to-school health kits, and screenings.',
+    services: ['Dental Health', 'Back-to-School Health'],
+    category: 'Youth',
+    view: 'services',
+    volunteerText: 'Volunteer Sign-Up',
+    volunteerLink: 'https://forms.cloud.microsoft/r/SndiircdxK'
+  },
+  {
+    title: 'Freedom Christian Bible Fellowship Community Health Fair',
+    date: 'Saturday, August 15, 2026 · 10:00 AM – 2:00 PM',
+    location: 'Freedom Christian Bible Fellowship (6100 W. Columbia Avenue, Philadelphia, PA 19151)',
+    description: 'Preventive health guidance, screenings, and hygiene kits for residents.',
+    services: ['Hygiene Supplies', 'Preventive Care'],
+    category: 'Hygiene',
+    view: 'services',
+    volunteerText: 'Volunteer Sign-Up',
+    volunteerLink: 'https://forms.cloud.microsoft/r/EmyGyw8HVk'
+  },
+  {
+    title: 'Community in Action Festival',
+    date: 'Saturday, August 22, 2026 · 12:00 PM – 4:00 PM',
+    location: 'Cobbs Creek Community Environmental Center (700 Cobbs Creek Pkwy, Philadelphia, PA 19143)',
+    description: 'Environmental health, physical screenings, and community resources.',
+    services: ['Environmental Health', 'Community Resources'],
+    category: 'Health',
+    view: 'services',
+    volunteerText: 'Volunteer Sign-Up',
+    volunteerLink: 'https://forms.office.com/Pages/ResponsePage.aspx?id=-uZkNr1HpkWWcIxPCA-MptyljNB2PdNMlR0DujKeEIRUNTFDTUNGQUlYODRXTDVUWEVaQVk5MU82TyQlQCN0PWcu'
+  },
+  {
+    title: '4th Annual Unity in the Community Block Party and Health Fair',
+    date: 'Saturday, August 22, 2026 · 11:00 AM to 4:00 PM',
+    location: 'Market Street between 60th and 61st in Philadelphia, PA 19139',
+    description: 'Health screenings, nutrition counseling, and community wellness.',
+    services: ['Health Screenings', 'Nutrition Counseling'],
+    category: 'Nutrition',
+    view: 'services',
+    volunteerText: 'Volunteer Sign-Up',
+    volunteerLink: 'https://forms.cloud.microsoft/r/VUiV3MkTtc'
+  },
+  {
+    title: 'Students Run Philly Style Sports Physicals',
+    date: 'Thursday, September 10, 2026 · 3:00 PM – 5:00 PM',
+    location: 'Northeast High School (1601 Cottman Ave, Philadelphia, PA 19111)',
+    description: 'Free youth sports physicals and health assessments for student athletes.',
+    services: ['Sports Physicals', 'Youth Health'],
+    category: 'Youth',
+    view: 'volunteer',
+    volunteerText: 'Volunteer Sign-Up',
+    volunteerLink: 'https://forms.cloud.microsoft/r/4h5LPR4hZ4'
+  },
+  {
+    title: 'Men’s Health and Prostate Workshop',
+    date: 'Saturday, September 12, 2026 · Time TBD',
+    location: 'Christian Stronghold Church (4701 Lancaster Ave, Philadelphia, PA 19131)',
+    description: 'Men’s health education and prostate cancer awareness.',
+    services: ['Men’s Health', 'Awareness Workshop'],
+    category: 'Health',
+    view: 'volunteer',
+    volunteerText: 'Volunteer Sign-Up',
+    volunteerLink: 'https://forms.office.com/r/eYXNEqtjBA'
+  },
+  {
+    title: 'Greater Exodus Community Day',
+    date: 'Saturday, September 12, 2026 · 11:00 AM – 3:00 PM',
+    location: 'Greater Exodus Church (704 N Broad St, Philadelphia, PA 19130)',
+    description: 'Health screenings, food, and hygiene distribution for families.',
+    services: ['Food Distribution', 'Hygiene Supplies'],
+    category: 'Hygiene',
+    view: 'volunteer',
+    volunteerText: 'Volunteer Sign-Up',
+    volunteerLink: 'https://forms.cloud.microsoft/r/werJMeFVeR'
+  },
+  {
+    title: 'Students Run Philly Style Sports Physicals',
+    date: 'Monday, September 14, 2026 · 2:45 PM – 4:00 PM',
+    location: 'Frankford High School (5000 Oxford Ave, Philadelphia, PA 19124)',
+    description: 'Free youth sports physicals and health assessments for student athletes.',
+    services: ['Sports Physicals', 'Youth Health'],
+    category: 'Youth',
+    view: 'volunteer',
+    volunteerText: 'Volunteer Sign-Up',
+    volunteerLink: 'https://forms.cloud.microsoft/r/niwEb2cb4g'
+  },
+  {
+    title: '2026 Elevate215 K-12 Philly School Fair',
+    date: 'Saturday, September 19, 2026 · 10:00 AM – 4:00 PM',
+    location: 'PA Convention Center (1101 Arch St, Philadelphia, PA 19107)',
+    description: 'School health resources and nutrition education for families.',
+    services: ['School Health', 'Nutrition Education'],
+    category: 'Nutrition',
+    view: 'volunteer',
+    volunteerText: 'Volunteer Sign-Up',
+    volunteerLink: 'https://forms.cloud.microsoft/r/ys1BVCpXqz'
+  },
+  {
+    title: 'Know Your Numbers – Salem Baptist Church',
+    date: 'Saturday, September 26, 2026 · 10:00 AM – 1:00 PM',
+    location: 'Salem Baptist Church (2716 Woodland Avenue, Abington, PA 19001)',
+    description: 'Blood pressure, glucose, BMI, and vital health screenings.',
+    services: ['Screenings', 'Health Education'],
+    category: 'Health',
+    view: 'volunteer',
+    volunteerText: 'Volunteer Sign-Up',
+    volunteerLink: 'https://forms.cloud.microsoft/r/FDTg89TFSU'
+  },
+  {
+    title: '2026 Philadelphia Heart Walk',
+    date: 'Saturday, October 24, 2026 · Time TBD',
+    location: 'Philadelphia, PA (Location TBD)',
+    description: 'Heart health awareness and community walk for wellness.',
+    services: ['Heart Health', 'Community Wellness'],
+    category: 'Health',
+    view: 'volunteer',
+    volunteerText: 'Volunteer Sign-Up',
+    volunteerLink: 'https://forms.cloud.microsoft/r/a1XWNNQ9CK'
+  },
+  {
+    title: 'DentMed, Inc Pop Clinic',
+    date: 'Saturday, October 17, 2026 – Sunday, October 18, 2026 · 7:00 AM – 4:00 PM',
+    location: 'The Eye Institute (1200 W. Godfrey Ave, Philadelphia, PA 19141)',
+    description: 'Free vision, dental, and medical screenings.',
+    services: ['Vision', 'Dental', 'Medical Screenings'],
+    category: 'Health',
+    view: 'volunteer',
+    volunteerText: 'Volunteer Sign-Up',
+    volunteerLink: 'https://forms.cloud.microsoft/r/4h5LPR4hZ4'
+  }
+];
+
+const filterCategories = ['All', 'Health', 'Nutrition', 'Youth', 'Hygiene'];
+const state = { query: '', category: 'All', view: 'services' };
+const eventCoordinates = {
+  'Free Fest 2026': [39.9034, -75.1710],
+  'National Night Out': [39.9562, -75.1845],
+  '16th Annual Back to School Carnival': [39.9996, -75.1466],
+  '2026 Back to School Community Fair': [39.9335, -75.2332],
+  'Family and Friends Day and Community Health Fair': [39.9730, -75.1713],
+  'Healthy Fam Jam': [39.9627, -75.1745],
+  'Kids Smile Back to School Bash': [39.9583, -75.2427],
+  'Freedom Christian Bible Fellowship Community Health Fair': [40.0457, -75.2181],
+  'Community in Action Festival': [39.9231, -75.2488],
+  '4th Annual Unity in the Community Block Party and Health Fair': [39.9592, -75.2425],
+  'Students Run Philly Style Sports Physicals': [40.0194, -75.0850],
+  'Men’s Health and Prostate Workshop': [39.9621, -75.1694],
+  'Greater Exodus Community Day': [39.9611, -75.1594],
+  '2026 Elevate215 K-12 Philly School Fair': [39.9543, -75.1637],
+  'Know Your Numbers – Salem Baptist Church': [40.1160, -75.0919],
+  '2026 Philadelphia Heart Walk': [39.9526, -75.1652],
+  'DentMed, Inc Pop Clinic': [39.9895, -75.1585]
+};
+
+const filterRow = document.getElementById('filterRow');
+const searchInput = document.getElementById('searchInput');
+const eventGrid = document.getElementById('eventGrid');
+const resultsMeta = document.getElementById('resultsMeta');
+const toggleButtons = document.querySelectorAll('.view-toggle button');
+const carefinderMap = document.getElementById('carefinder-map');
+let mapMarkers = [];
+let mapInstance = null;
+
+if (typeof L !== 'undefined' && carefinderMap) {
+  mapInstance = L.map('carefinder-map', { zoomControl: true }).setView([39.95, -75.17], 11);
+  L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+    attribution: '&copy; OpenStreetMap contributors'
+  }).addTo(mapInstance);
+}
+
+function buildFilterButtons() {
+  filterRow.innerHTML = filterCategories.map((item) => {
+    const activeClass = state.category === item ? 'active' : '';
+    return `<button class="filter-chip ${activeClass}" data-category="${item}">${item}</button>`;
+  }).join('');
+}
+
+function getFilteredEvents() {
+  const query = state.query.toLowerCase();
+  return events.filter((event) => {
+    const matchesView = state.view === 'all' || event.view === state.view;
+    const matchesCategory = state.category === 'All' || event.category === state.category;
+    const haystack = `${event.title} ${event.location} ${event.description} ${event.services.join(' ')}`.toLowerCase();
+    const matchesQuery = !query || haystack.includes(query);
+    return matchesView && matchesCategory && matchesQuery;
+  });
+}
+
+function renderMapMarkers() {
+  if (!mapInstance) return;
+
+  mapMarkers.forEach((marker) => mapInstance.removeLayer(marker));
+  mapMarkers = [];
+
+  const filtered = getFilteredEvents();
+
+  filtered.forEach((event) => {
+    const coordinates = eventCoordinates[event.title];
+    if (!coordinates) return;
+
+    const marker = L.marker(coordinates).addTo(mapInstance);
+    marker.bindTooltip(`${event.title}<br>${event.date}<br>${event.location}`, { sticky: true, direction: 'top', offset: [0, -8] });
+    marker.bindPopup(`<strong>${event.title}</strong><br>${event.date}<br><br>${event.location}`);
+    mapMarkers.push(marker);
+  });
+
+  if (mapMarkers.length) {
+    const bounds = L.featureGroup(mapMarkers).getBounds();
+    mapInstance.fitBounds(bounds.pad(0.2));
+  } else {
+    mapInstance.setView([39.95, -75.17], 11);
+  }
+}
+
+function renderEvents() {
+  const filtered = getFilteredEvents();
+  resultsMeta.textContent = `${filtered.length} event${filtered.length === 1 ? '' : 's'} match your filters.`;
+
+  if (!filtered.length) {
+    eventGrid.innerHTML = '<div class="empty-state">No events matched your search yet. Try a broader neighborhood or service term.</div>';
+    renderMapMarkers();
+    return;
+  }
+
+  eventGrid.innerHTML = filtered.map((event) => {
+    const calendarUrl = `https://calendar.google.com/calendar/render?action=TEMPLATE&text=${encodeURIComponent(event.title)}&dates=20260804T170000/20260804T200000&location=${encodeURIComponent(event.location)}`;
+    return `
+      <article class="event-card">
+        <h3>${event.title}</h3>
+        <div class="meta">${event.date}</div>
+        <div class="meta">${event.location}</div>
+        <p>${event.description}</p>
+        <div>${event.services.map((service) => `<span class="pill">${service}</span>`).join('')}</div>
+        <div class="card-actions">
+          <a class="btn btn-lavender" href="${calendarUrl}" target="_blank" rel="noopener">Add to Calendar</a>
+        </div>
+      </article>
+    `;
+  }).join('');
+  renderMapMarkers();
+}
+
+searchInput.addEventListener('input', (event) => {
+  state.query = event.target.value;
+  renderEvents();
+});
+
+filterRow.addEventListener('click', (event) => {
+  const button = event.target.closest('[data-category]');
+  if (!button) return;
+  state.category = button.getAttribute('data-category');
+  buildFilterButtons();
+  renderEvents();
+});
+
+toggleButtons.forEach((button) => {
+  button.addEventListener('click', () => {
+    toggleButtons.forEach((item) => item.classList.remove('active'));
+    button.classList.add('active');
+    state.view = button.getAttribute('data-view');
+    renderEvents();
+  });
+});
+
+buildFilterButtons();
+renderEvents();
+</script>
+</body>
+</html>
